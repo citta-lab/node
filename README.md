@@ -11,9 +11,13 @@
   Node make uses of unix POSIX standards to communicate with it's surrounding environment, this helps node to work with IO ( remember javascript doesn't communicate with IO stream and hence node had to adopt this )
 
 - console.log('text') vs console.error('text')
-  In console or terminal (if node) we would see both of them printing without any much difference but in system level console.error('text') is redirected to different output using streams, so using console.error('text') is better while handling error's. 
+  In console or terminal (if node) we would see both of them printing without any much difference but in system level console.error('text') is redirected to different output using streams, so using console.error('text') is better while handling error's.
 
 
 
- process: Available all over our program
- stdout: One of the three available method to communicate.
+## Pointers
+ - `process` is available all over our program
+ - `stdout` is one of the three available standard streams, used for output. Example: `process.stdout.write("Hello node")`;
+ - `#!/usr/bin/env node` is same as writing `#!sh` for shell, but in our case we are letting the system figure out to find the node by using `env`.
+ - by doing `chmod u+x fileName.js` we can convert node script to executable, so we can run the file by doing `./fileName.js` instead of `node fileName.js`
+ 
