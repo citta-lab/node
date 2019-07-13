@@ -6,6 +6,8 @@
 - node is NOT for CPU bound tasks
 - Best suitable as middle-wear proxy between front end and backend systems.
 - By default most IO operations returns low level buffer, hence using console.log on reading file data will output actual low level buffer data. Hence use `process.stdout.write(data)`
+- node focuses on everything to be asynchronous but the start of the script. Hence `require` is synchronous.
+- node's standard signature for callback functions take `error` as first param. i.e `function callback(err, data){ }`.
 
 
 - How node connects to it's environment around it ?
@@ -76,13 +78,16 @@ console.log(filepath); // path of the file
 Similarly if we make use of in build `__dirname` it will print the absolute path to the current directory.
 
 ##### 3.4 File Access
-`fs` node package can be used to read and write from the file. we make use of synchronous process `readFileSync` and parsed `args` from minimist package.
+`fs` node package can be used to read and write from the file. we make use of synchronous process `readFileSync` or asynchronous prcess `readFile` and parsed `args` from minimist package.
+
+3.4.1 Synchronous File Processing:
 ```javascript
 // fileName: processFile.js
 var fs = require('fs');
 
 var file_args = require("minimist")(process.argv.slice(2), {string: ["file"]});
 const filepath = path.resolve(file_args.file);
+
 function processFile(filepath){
     var content = fs.readFileSync(filepath);
     process.stdout.write(content); // string buffer to print the data
@@ -94,4 +99,25 @@ processFile(filepath)
 we can run the script by doing below, where `hello.txt` is the file to be read.
 ```shell
 ./processFile.js --file=files/hello.txt
+```
+we can make the `readFileSync` handle the buffering for us by using second parameter as `utf8` encoding. Then the line of code becomes like `var content = fs.readFileSync(filepath, 'utf8');`.
+
+3.4.2 Asynchronous File Processing
+It is okay to read the file synchronously but asynchronous is always a better option as node is built for asynchronous processing. So we will convert above synchronous code to asynchronous by changing `readFileSync` to `readFile` and handling the `callback` instead pf expecting the content.
+```javascript
+var fs = require('fs');
+
+var file_args = require("minimist")(process.argv.slice(2), {string: ["file"]});
+const filepath = path.resolve(file_args.file);
+function processFile(filepath){
+    fs.readFile(filepath, function onContets(err, content){
+        if(err){
+            error(err.toString())
+        }else{
+            process.stdout.write(content)
+        }
+    });
+}
+
+processFile(filepath);
 ```
