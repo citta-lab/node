@@ -5,6 +5,7 @@
 - Threads can be very highly efficient for CPU bound process but threads were not as efficient as CPU when it comes to IO bound process.
 - node is NOT for CPU bound tasks
 - Best suitable as middle-wear proxy between front end and backend systems.
+- By default most IO operations returns low level buffer, hence using console.log on reading file data will output actual low level buffer data. Hence use `process.stdout.write(data)`
 
 
 - How node connects to it's environment around it ?
@@ -66,9 +67,31 @@ ran the file by doing `./fileName.js --hello=node --name`.
 ##### 3.3 Path
 `path` is not package which we can use to find the path of the file or executing command. Below example is continuation of the above,
 ```javascript
-// args are derived from above minimist handling 
+// args are derived from above minimist handling
 
 let path = require('path');
 let filepath = path.resolve(args.file);
 console.log(filepath); // path of the file
+```
+Similarly if we make use of in build `__dirname` it will print the absolute path to the current directory.
+
+##### 3.4 File Access
+`fs` node package can be used to read and write from the file. we make use of synchronous process `readFileSync` and parsed `args` from minimist package.
+```javascript
+// fileName: processFile.js
+var fs = require('fs');
+
+var file_args = require("minimist")(process.argv.slice(2), {string: ["file"]});
+const filepath = path.resolve(file_args.file);
+function processFile(filepath){
+    var content = fs.readFileSync(filepath);
+    process.stdout.write(content); // string buffer to print the data
+    console.log(content); // this will print actual low level buffer
+}
+
+processFile(filepath)
+```
+we can run the script by doing below, where `hello.txt` is the file to be read.
+```shell
+./processFile.js --file=files/hello.txt
 ```
