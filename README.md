@@ -5,9 +5,7 @@
 - Threads can be very highly efficient for CPU bound process but threads were not as efficient as CPU when it comes to IO bound process.
 - node is NOT for CPU bound tasks
 - Best suitable as middle-wear proxy between front end and backend systems.
-- By default most IO operations returns low level buffer, hence using console.log on reading file data will output actual low level buffer data. Hence use `process.stdout.write(data)`
-- node focuses on everything to be asynchronous but the start of the script. Hence `require` is synchronous.
-- node's standard signature for callback functions take `error` as first param. i.e `function callback(err, data){ }`.
+
 
 
 - How node connects to it's environment around it ?
@@ -21,13 +19,15 @@
 ## Pointers
  - `process` is available all over our program
  - `stdout` is one of the three available standard streams, used for output. Example: `process.stdout.write("Hello node")`;
- - `#!/usr/bin/env node` is same as writing `#!sh` for shell, but in our case we are letting the system figure out to find the node by using `env`.
- - by doing `chmod u+x fileName.js` we can convert node script to executable, so we can run the file by doing `./fileName.js` instead of `node fileName.js`
+ - By default most IO operations returns low level buffer, hence using console.log on reading file data will output actual low level buffer data. Hence use `process.stdout.write(data)`
+ - node focuses on everything to be asynchronous but the start of the script. Hence `require` is synchronous.
+ - node's standard signature for callback functions take `error` as first param. i.e `function callback(err, data){ }`.
+
 
 
 ## Quick Pointers
 
-#### 1.0 Making Executable
+### 1.0 Making Executable
 Typically we will execute our node script with command like `node fileName.js`, however if we make this file as an executable then we don't really need to pass in the `node`, below is the step to do that.
 ```shell
 chmod u+x fileName.js
@@ -36,17 +36,17 @@ chmod u+x fileName.js
 ./fileName.js
 ```
 
-#### 2.0 Define as node file
+### 2.0 Define as node file
 Usually if we are writing shell script we define `shebang` at the top of the file to let the compiler know this is of type `shell` script i.e `#!/bin/bash  `. Similarly, phython, perl, list and even node has it's own
 ```shell
 #!/usr/bin/env node
 ```
 The main takeaway from this above shebang is, instead of finding installed node path for this script to use we are letting the environment do the job for us. Hence we are pointing to `env` and then asking env to look for `node`.
 
-#### 3.0 Handle Arguments
+### 3.0 Handle Arguments
 we could capture all the passed arguments from the `argv` command but it will send array of commands which we need to process. Let us look into how `argv` works, if we use `process.argv` then it will return installed node path and path to file in an array. If we do `process.argv.slice(2)` it would slice first two elements and returns the third passed argument. The best way to handle this is using `minimist` package which will parse the array of objects and returns objects.
 
-##### 3.1 Processing Args
+#### 3.1 Processing Args
 if we add code as mentioned below to `processArgs.js` and execute by running `node processArgs.js` then we will see commented output.
 ```javascript
 console.log(process.argv.slice(2));  // [ '--hello=node', '-hi101' ]
@@ -54,7 +54,7 @@ var args = require("minimist")(process.argv.slice(2));
 console.log(args) // { _: [], hello: 'node', h: 'i101' }
 ```
 
-##### 3.2 Customize Args
+#### 3.2 Customize Args
 If we want to enforce some customization based on passed argument name then we could pass in object of key value pair as second argument to `minimist`. Let us look into an example,
 ```javascript
 var args = require("minimist")(process.argv.slice(2), {
@@ -66,7 +66,7 @@ console.log(args); //{ _: [], hello: true, name: '' }
 ```
 ran the file by doing `./fileName.js --hello=node --name`.
 
-##### 3.3 Path
+#### 3.3 Path
 `path` is not package which we can use to find the path of the file or executing command. Below example is continuation of the above,
 ```javascript
 // args are derived from above minimist handling
@@ -77,10 +77,10 @@ console.log(filepath); // path of the file
 ```
 Similarly if we make use of in build `__dirname` it will print the absolute path to the current directory.
 
-##### 3.4 File Access
+#### 3.4 File Access
 `fs` node package can be used to read and write from the file. we make use of synchronous process `readFileSync` or asynchronous prcess `readFile` and parsed `args` from minimist package.
 
-3.4.1 Synchronous File Processing:
+##### 3.4.1 Synchronous File Processing:
 ```javascript
 // fileName: processFile.js
 var fs = require('fs');
@@ -102,7 +102,8 @@ we can run the script by doing below, where `hello.txt` is the file to be read.
 ```
 we can make the `readFileSync` handle the buffering for us by using second parameter as `utf8` encoding. Then the line of code becomes like `var content = fs.readFileSync(filepath, 'utf8');`.
 
-3.4.2 Asynchronous File Processing
+##### 3.4.2 Asynchronous File Processing     
+
 It is okay to read the file synchronously but asynchronous is always a better option as node is built for asynchronous processing. So we will convert above synchronous code to asynchronous by changing `readFileSync` to `readFile` and handling the `callback` instead pf expecting the content.
 ```javascript
 var fs = require('fs');
