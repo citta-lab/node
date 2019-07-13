@@ -42,9 +42,33 @@ The main takeaway from this above shebang is, instead of finding installed node 
 
 #### 3.0 Handle Arguments
 we could capture all the passed arguments from the `argv` command but it will send array of commands which we need to process. Let us look into how `argv` works, if we use `process.argv` then it will return installed node path and path to file in an array. If we do `process.argv.slice(2)` it would slice first two elements and returns the third passed argument. The best way to handle this is using `minimist` package which will parse the array of objects and returns objects.
+
+##### 3.1 Processing Args
 if we add code as mentioned below to `processArgs.js` and execute by running `node processArgs.js` then we will see commented output.
 ```javascript
 console.log(process.argv.slice(2));  // [ '--hello=node', '-hi101' ]
 var args = require("minimist")(process.argv.slice(2));
 console.log(args) // { _: [], hello: 'node', h: 'i101' }
+```
+
+##### 3.2 Customize Args
+If we want to enforce some customization based on passed argument name then we could pass in object of key value pair as second argument to `minimist`. Let us look into an example,
+```javascript
+var args = require("minimist")(process.argv.slice(2), {
+  boolean: ["help"],
+  string: ["name"]
+});
+
+console.log(args); //{ _: [], hello: true, name: '' }
+```
+ran the file by doing `./fileName.js --hello=node --name`.
+
+##### 3.3 Path
+`path` is not package which we can use to find the path of the file or executing command. Below example is continuation of the above,
+```javascript
+// args are derived from above minimist handling 
+
+let path = require('path');
+let filepath = path.resolve(args.file);
+console.log(filepath); // path of the file
 ```
