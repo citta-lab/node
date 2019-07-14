@@ -110,6 +110,7 @@ var fs = require('fs');
 
 var file_args = require("minimist")(process.argv.slice(2), {string: ["file"]});
 const filepath = path.resolve(file_args.file);
+
 function processFile(filepath){
     fs.readFile(filepath, function onContets(err, content){
         if(err){
@@ -122,3 +123,6 @@ function processFile(filepath){
 
 processFile(filepath);
 ```
+##### 3.4.3 Read File as Standard input
+
+If we are interested in reading the file content from the command line and run the node script along with that then we can do that by installing another node package called `get-stdin`. 
