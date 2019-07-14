@@ -125,4 +125,24 @@ processFile(filepath);
 ```
 ##### 3.4.3 Read File as Standard input
 
-If we are interested in reading the file content from the command line and run the node script along with that then we can do that by installing another node package called `get-stdin`. 
+If we are interested in reading the file content from the command line and run the node script along with that then we can do that by installing another node package called `get-stdin`. This returns a promise so the response should be handled using then. i.e
+```javascript
+var getStdin = require('get-stdin');
+
+// handling reading files
+getStdin().then(handleFileContentFunction).catch(errorFunction);
+
+// handleFileContentFunction - should take care of handling the content
+// errorFunction - should handle error logic.
+```
+
+##### 3.4.4 Reading ENV variables
+```javascript
+// Syntax: process.env.NAME_VARIABLE
+
+var BASE_PATH = path.resolve(
+    // if BASE_PATH found use it or use the current directory
+    process.env.BASE_PATH || __dirname
+);
+```
+we can test this by executing `BASE_PATH='/testfolder/' ./processFile.js` or `./processFile.js`.
