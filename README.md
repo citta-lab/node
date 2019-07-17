@@ -5,7 +5,7 @@
 - Threads can be very highly efficient for CPU bound process but threads were not as efficient as CPU when it comes to IO bound process.
 - node is NOT for CPU bound tasks
 - Best suitable as middle-wear proxy between front end and backend systems.
-
+- In streams, data are read and written in chunks of size 64Kb, Also it is important to remember `.pipe()` method is only available in readable stream.
 
 
 - How node connects to it's environment around it ?
@@ -146,3 +146,25 @@ var BASE_PATH = path.resolve(
 );
 ```
 we can test this by executing `BASE_PATH='/testfolder/' ./processFile.js` or `./processFile.js`.
+
+## Streams
+
+### 1.0 Input & Output Stream: 
+Though node is meant for IO operations, in case of reading and writing from the file is memory consuming. Because when we read or write to/from the file we do it as a string, not as chunks which need space in memory. Read more about stream [here](https://github.com/substack/stream-handbook).
+      Making use of streams to read the data from the file would like this, btw we can execute the file by
+doing `./processFile.js --file=dataFile.txt`
+```javascript
+function readData(){
+    const BASE_PATH = path.resolve(process.env.BASE_PATH || __dirname);
+    let stream = fs.createReadStream(path.join(BASE_PATH, args.file));
+    processFileAsStream(stream);
+}
+
+function processFileAsStream(streamData){
+    var targetStream = process.stdout;
+    streamData.pipe(targetStream);
+}
+
+readData();
+```
+Here is the complete example of the above snippet.
