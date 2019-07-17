@@ -149,7 +149,7 @@ we can test this by executing `BASE_PATH='/testfolder/' ./processFile.js` or `./
 
 ## Streams
 
-### 1.0 Input & Output Stream: 
+#### 1.0 Input & Output Stream:
 Though node is meant for IO operations, in case of reading and writing from the file is memory consuming. Because when we read or write to/from the file we do it as a string, not as chunks which need space in memory. Read more about stream [here](https://github.com/substack/stream-handbook).
       Making use of streams to read the data from the file would like this, btw we can execute the file by
 doing `./processFile.js --file=dataFile.txt`
@@ -167,4 +167,6 @@ function processFileAsStream(streamData){
 
 readData();
 ```
-Here is the complete example of the above snippet.
+Here is the complete [example](https://github.com/citta-lab/node/blob/master/examples/streams/readFileWithStream.js) of the above snippet.
+
+#### 2.0 Transform Input Stream: 
