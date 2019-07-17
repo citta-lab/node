@@ -170,7 +170,7 @@ readData();
 Here is the complete [example](https://github.com/citta-lab/node/blob/master/examples/streams/readFileWithStream.js) of the above snippet.
 
 #### 2.0 Transform Input Stream:
-
+If we want to transform the data to something else then we can use `Transform` from stream on chunks as mentioned below,
 ```javascript
 function processFileAsStream(streamData){
     var outputStream = streamData;
@@ -187,3 +187,4 @@ function processFileAsStream(streamData){
     outputStream.pipe(targetStream);
 }
 ```
+complete runnable example is [here](https://github.com/citta-lab/node/blob/master/examples/streams/transformWithStream.js).

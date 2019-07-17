@@ -23,9 +23,9 @@ function processFileAsStream(streamData){
         }
     })
 
-    outputStream = outputStream.pipe(upperStream);
+    outputStream = outputStream.pipe(upperStream); // this will keep adding input data to output
     var targetStream = process.stdout;
-    outputStream.pipe(targetStream);
+    outputStream.pipe(targetStream); // finally all gathered input is written to output console 
 }
 
 readData(); // Hello World
