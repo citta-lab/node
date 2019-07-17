@@ -169,4 +169,21 @@ readData();
 ```
 Here is the complete [example](https://github.com/citta-lab/node/blob/master/examples/streams/readFileWithStream.js) of the above snippet.
 
-#### 2.0 Transform Input Stream: 
+#### 2.0 Transform Input Stream:
+
+```javascript
+function processFileAsStream(streamData){
+    var outputStream = streamData;
+
+    var upperStream = new Transform({
+        transform(chunckData, encode, callback){
+            this.push(chunckData.toString().toUpperCase());
+            callback(); // letting stream know it's processed
+        }
+    })
+
+    outputStream = outputStream.pipe(upperStream);
+    var targetStream = process.stdout;
+    outputStream.pipe(targetStream);
+}
+```
