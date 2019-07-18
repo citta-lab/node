@@ -6,6 +6,7 @@
 - node is NOT for CPU bound tasks
 - Best suitable as middle-wear proxy between front end and backend systems.
 - In streams, data are read and written in chunks of size 64Kb, Also it is important to remember `.pipe()` method is only available in readable stream.
+- Asynchronous promise handling is great but this process will run until it's finished, there is no cancellation if something bad happens. So we can use `caf` package along with generator to stop the process.
 
 
 - How node connects to it's environment around it ?
@@ -235,4 +236,4 @@ function processFileAsStream(streamData){
     outputStream.pipe(targetStream);
 }
 ```
-here is the complete [example]() of gzipping. 
+here is the complete [example]() of gzipping.
