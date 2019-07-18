@@ -31,7 +31,7 @@ function processFileAsStream(streamData){
     outputStream.pipe(targetStream);
 }
 
-readData(); // HELLO WORLD, MAHESH
+readData(); // output_file.txt with data will be created 
 
 
 /**
