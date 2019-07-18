@@ -188,3 +188,24 @@ function processFileAsStream(streamData){
 }
 ```
 complete runnable example is [here](https://github.com/citta-lab/node/blob/master/examples/streams/transformWithStream.js).
+
+##### 2.1 Writing to File
+Instead of writing the transformed stream data to output, we can write it to the file as a stream using `createWriteStream` method from `fs`.
+```javascript
+function processFileAsStream(streamData){
+    var outputStream = streamData;
+    var OUTPUTFILE = path.join(BASE_PATH, 'output_file.txt')
+
+    var upperStream = new Transform({
+        transform(chunckData, encode, callback){
+            this.push(chunckData.toString().toUpperCase());
+            callback(); // letting stream know it's processed
+        }
+    })
+
+    outputStream = outputStream.pipe(upperStream);
+    var targetStream = fs.createWriteStream(OUTPUTFILE);
+    outputStream.pipe(targetStream);
+}
+```
+complete example is here

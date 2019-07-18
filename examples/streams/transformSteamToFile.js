@@ -4,17 +4,20 @@ let path = require('path');
 var fs = require('fs');
 var Transform = require('stream').Transform;
 
+const BASE_PATH = path.resolve(process.env.BASE_PATH || __dirname);
+
 function readData(){
     const args = require("minimist")(process.argv.slice(2), {
         string: ["file"]
     });
-    const BASE_PATH = path.resolve(process.env.BASE_PATH || __dirname);
+
     let stream = fs.createReadStream(path.join(BASE_PATH, args.file));
-    processFileAsStream(stream);
+    processFileAsStream(stream, BASE_PATH);
 }
 
 function processFileAsStream(streamData){
     var outputStream = streamData;
+    var OUTPUTFILE = path.join(BASE_PATH, 'output_file.txt')
 
     var upperStream = new Transform({
         transform(chunckData, encode, callback){
@@ -24,7 +27,7 @@ function processFileAsStream(streamData){
     })
 
     outputStream = outputStream.pipe(upperStream);
-    var targetStream = process.stdout;
+    var targetStream = fs.createWriteStream(OUTPUTFILE);
     outputStream.pipe(targetStream);
 }
 
