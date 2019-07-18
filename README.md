@@ -169,7 +169,7 @@ readData();
 ```
 Here is the complete [example](https://github.com/citta-lab/node/blob/master/examples/streams/readFileWithStream.js) of the above snippet.
 
-#### 2.0 Transform Input Stream:
+#### 2.0 Transform Input to Screen (using Stream):
 If we want to transform the data to something else then we can use `Transform` from stream on chunks as mentioned below,
 ```javascript
 function processFileAsStream(streamData){
@@ -189,7 +189,7 @@ function processFileAsStream(streamData){
 ```
 complete runnable example is [here](https://github.com/citta-lab/node/blob/master/examples/streams/transformWithStream.js).
 
-##### 2.1 Writing to File
+#### 3.0 Writing to File (using Stream)
 Instead of writing the transformed stream data to output, we can write it to the file as a stream using `createWriteStream` method from `fs`.
 ```javascript
 function processFileAsStream(streamData){
@@ -208,4 +208,31 @@ function processFileAsStream(streamData){
     outputStream.pipe(targetStream);
 }
 ```
-complete example is here
+complete example is [here](https://github.com/citta-lab/node/blob/master/examples/streams/transformSteamToFile.js)
+
+#### 4.0 Unzip & Zip (using Stream)
+Using node built zip and unzip process for stream. This require a package called `zlip`.
+```javascript
+function processFileAsStream(streamData){
+    var outputStream = streamData;
+    var OUTPUTFILE = path.join(BASE_PATH, 'output_file.txt')
+
+    var upperStream = new Transform({
+        transform(chunckData, encode, callback){
+            this.push(chunckData.toString().toUpperCase());
+            callback(); // letting stream know it's processed
+        }
+    })
+
+    outputStream = outputStream.pipe(upperStream);
+
+    //need to zip it before outputting the file
+    let zipStream = zlib.createGzip();
+    outputStream = outputStream.pipe(zipStream);
+    OUTPUTFILE = `${OUTPUTFILE}.gz`;
+
+    var targetStream = fs.createWriteStream(OUTPUTFILE);
+    outputStream.pipe(targetStream);
+}
+```
+here is the complete [example]() of gzipping. 
