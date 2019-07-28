@@ -1,9 +1,10 @@
 # Node
 
 ## History & Why
+- Node is not a framework but `runtime` environment to execute javascript code.
 - Started as high throughput, low latency socket server for network communications. Which started making use of "asynchronous event looping for IO bound communications".
 - Threads can be very highly efficient for CPU bound process but threads were not as efficient as CPU when it comes to IO bound process.
-- node is NOT for CPU bound tasks
+- node is NOT for CPU bound tasks ( ex:  video encoding, image manipulation etc )
 - Best suitable as middle-wear proxy between front end and backend systems.
 - In streams, data are read and written in chunks of size 64Kb, Also it is important to remember `.pipe()` method is only available in readable stream.
 - Asynchronous promise handling is great but this process will run until it's finished, there is no cancellation if something bad happens. So we can use `caf` package along with generator to stop the process.
@@ -18,13 +19,75 @@
 
 
 ## Pointers
+ - In node we refer of `global` object similar to one in browsers like `window` object.
  - `process` is available all over our program
  - `stdout` is one of the three available standard streams, used for output. Example: `process.stdout.write("Hello node")`;
  - By default most IO operations returns low level buffer, hence using console.log on reading file data will output actual low level buffer data. Hence use `process.stdout.write(data)`
  - node focuses on everything to be asynchronous but the start of the script. Hence `require` is synchronous.
  - node's standard signature for callback functions take `error` as first param. i.e `function callback(err, data){ }`.
+ - In node, every file we create represents a module. This is achieved by `module` property in node and we can inspect it by `console.log(module)`.
+ - While working with files use `path` built in node module which gives useful information about the file. i.e `root, directory, name of the file, extension, file without extension`.
+ - If we are interested in running operating system then use `os` module from node.
+ - While working with `events` make sure to register the `listener` before declaring `emit` method.
+ - `http.createServer()` returns an object which will extends `EventEmitter` class so we can make use of listening and emitting events once the server is created.
 
 
+
+
+## Core Principals
+
+### 1.0 Global Object
+In node we have global object similar to one like `window` ( i.e global scope in browsers ) for all the browsers. Below are the methods available in global object.
+```javascript
+setTimeout();
+clearTimeout();
+
+setInterval();
+clearInterval();
+```
+Also it is important to know about `modular` system in node is different than what we are used to in browsers. Example: If we define global object in browsers it will be available in window object. However it's not the same case in node ( i.e is not available in global object ).
+```javascript
+// run this in browsers
+var message = "hello";
+console.log(window.message); // hello
+
+// run this in node
+var message = "hello";
+console.log(global.message); // undefined
+```
+so whatever is defined the node file is only available in that file and not polluted to global object.
+
+### Being Module
+Lets look into `module` in node i.e by doing console.log(module). We are particularly interested in `exports` object which exposes the module to outside world. Important to remember every file is wrapped with a `iffi` which has 4 function parameters such as `exports, module, require, __filename, __dirname`.This helps in exporting and importing the file functions we are about to see.
+```javascript
+// module property
+Module {
+  id: '',
+  path: 'path_to_file',
+  exports: {}, // <-- this help us expose our secluded module to outside world
+  parent: null,
+  filename: 'path to file',
+  ...
+}
+```
+
+#### 1.0 Example exposing the function
+```javascript
+//filename: greetFile.js
+var message = "Hey there";
+function greet(message){
+  console.log(message);
+}
+
+module.exports.greet = greet; // now this is exposed to global node object
+```
+Okay, now we need to import this in some other files than defined file. We make use of `require`.
+```javascript
+const greeting = require('./greetFile');
+
+const test = greeting.greet("I'm here");
+console.log(test); // I'm here
+```
 
 ## Quick Pointers
 
@@ -156,6 +219,10 @@ Though node is meant for IO operations, in case of reading and writing from the 
 doing `./processFile.js --file=dataFile.txt`
 ```javascript
 function readData(){
+
+    const args = require("minimist")(process.argv.slice(2), {
+      string: ["file"]
+    });
     const BASE_PATH = path.resolve(process.env.BASE_PATH || __dirname);
     let stream = fs.createReadStream(path.join(BASE_PATH, args.file));
     processFileAsStream(stream);
@@ -163,7 +230,7 @@ function readData(){
 
 function processFileAsStream(streamData){
     var targetStream = process.stdout;
-    streamData.pipe(targetStream);
+    streamData.pipe(targetStream); // inputstream.pipe(outputstream)
 }
 
 readData();

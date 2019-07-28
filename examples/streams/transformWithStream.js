@@ -35,5 +35,6 @@ readData(); // HELLO WORLD, MAHESH
  * Instructions to Execute the Script.
  * FileName: prcoessFile.js
  * DataFile: dataFile.js ( contains 'Hello World' )
- * Execute Command: `./processFile.js --file=dataFile.js`
+ * Execute Command: `./processFile.js --file=./data/dataFile.js`
+ * you also need to add all the required npm modules to work. 
  */
