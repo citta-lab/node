@@ -31,6 +31,20 @@
  - While working with `events` make sure to register the `listener` before declaring `emit` method.
  - `http.createServer()` returns an object which will extends `EventEmitter` class so we can make use of listening and emitting events once the server is created.
 
+## Inner Parts
+- node is error first pattern and hence it will always insert error object for first placeholder and data as second placeholder in `callback` (i.e auto run function).
+- node uses `libuv` C/C++ library to communicate with computer internals. So this makes the node independent of any operating system and/or machine.
+- Mostly `libuv` process all IO related request asynchronously such as `http`, `socket` related. But when it comes to file system it makes use of `threads` to communicate with the computer internals instead of depending on the computer kernel.
+- `libuv` has 4 dedicated thread to use but it is designed to use `asynchronous` event handling is all most all situations.
+- `POSIX` is used internally by `libuv` to talk to computer networks.
+- javascript is `single` threaded and code execution and event loop handling via `call stack` is handled in the same single thread.
+- node returns file data in buffer format ( bunch of `1` & `0`) as buffers are used better for storing and managing data.
+- `streams` are used to process the file in batches and `callback` queue mechanism to process the returned batch data in order.
+- By default batch size is `64KB` but user can always customize.
+- `EVENT LOOP` checks on `callback queue` whenever the call stack is done executing the current and pending global function. This constant check is achieved by event loop provided by `libuv`.
+- Call Stack will be managed by javascript which keeps track of what function is being run and where it was ran from. Whenever the function needs to be run, it add to the `Call Stack`. However, if any functions delayed from running ( i.e ran from node automatically as callback ) are added to the `Callback Queue` when the background node task has completed. `Event loop`, picks up the function to be ran from the `Callback Queue`. Similar callback queue is actually maintained by `WebApi` for browsers, in our case it's done by Node.
+- Order of dequeuing `1. Network Queue`, `2. Timer Queue`, `3. I/O Callback Queue`, `4. Check Queue` and `5. Close Queue`.
+- setTimeout will go to Timer Queue, setImmediate will go to Check Queue. All node callbacks ( auto run functions ) will go to `IO Callback Queue`. process & promises will fall into `Network Queue`. 
 
 
 
