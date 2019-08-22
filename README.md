@@ -1,6 +1,7 @@
 # Node
 
 ## History & Why
+- Handles high concurrent request asynchronously using event loop, hence it can take more work load to process the request with just single thread.
 - Node is not a framework but `runtime` environment to execute javascript code.
 - Started as high throughput, low latency socket server for network communications. Which started making use of "asynchronous event looping for IO bound communications".
 - Threads can be very highly efficient for CPU bound process but threads were not as efficient as CPU when it comes to IO bound process.
@@ -44,9 +45,11 @@
 - `EVENT LOOP` checks on `callback queue` whenever the call stack is done executing the current and pending global function. This constant check is achieved by event loop provided by `libuv`.
 - Call Stack will be managed by javascript which keeps track of what function is being run and where it was ran from. Whenever the function needs to be run, it add to the `Call Stack`. However, if any functions delayed from running ( i.e ran from node automatically as callback ) are added to the `Callback Queue` when the background node task has completed. `Event loop`, picks up the function to be ran from the `Callback Queue`. Similar callback queue is actually maintained by `WebApi` for browsers, in our case it's done by Node.
 - Order of dequeuing `1. Network Queue`, `2. Timer Queue`, `3. I/O Callback Queue`, `4. Check Queue` and `5. Close Queue`.
-- setTimeout will go to Timer Queue, setImmediate will go to Check Queue. All node callbacks ( auto run functions ) will go to `IO Callback Queue`. process & promises will fall into `Network Queue`. 
+- setTimeout will go to Timer Queue, setImmediate will go to Check Queue. All node callbacks ( auto run functions ) will go to `IO Callback Queue`. process & promises will fall into `Network Queue`.
 
-
+## Express
+- Standard and most widely used framework for managing sockets, routes, error handling etc.
+-
 
 ## Core Principals
 
@@ -318,3 +321,110 @@ function processFileAsStream(streamData){
 }
 ```
 here is the complete [example]() of gzipping.
+
+## Node API Design Guidelines
+
+### 1. Using Middleware
+Any program sits in between user request and response. In express we can establish few middleware to run before we respond to the user request. One such example is adding `cors` for all the request, converting request to `json` response etc.
+
+```javascript
+import express from 'express';
+import { json, urlencoded } from 'body-parser';
+
+export const app = express();
+
+app.disable('x-powered-by'); // runs 1st for all request because of `.use`
+
+app.use(cors()); // runs 2nd for all request because of `.use`
+app.use(json()); // runs 3rd for all request because of `.use`
+
+// runs our defined route at last
+app.get('/', (req, res) => {
+  res.send({ msg: 'hello World'})
+})
+```
+
+### 2. Adding Custom Middleware
+If we want to add specific custom middlewear which needs to be ran on specific route per say then we can define the middleware function and call that. Example: we are adding log for `/` route and not for `/about` then it would look like below,
+
+```javascript
+//same as above, only changes are added here
+
+const log = (req, res, next) => {
+  console.log('logging middleware');
+  next(); // this allows to keep executing the next function in the stack rather than pausing here
+}
+
+// runs log middleware
+app.get('/', log, (req, res) => {
+  res.send({ msg: 'hello World'})
+})
+
+// doesn't run log middleware
+app.get('/about', (req, res) => {
+  res.send({ msg: 'This is all about me'})
+})
+```
+If we are interested in making all the routes to use this `log` middleware then we should do `app.use(log)` as we did for other `json` and `cors` middleware. Or you can also pass an array of middleware as an second argument.
+
+### 3. Next
+Earlier we used next() to pass on to next function in the stack to execute. If we don't have next handled then it will stop the execution and will not execute anything after. Including the routes. Example:
+```javascript
+const log = (req, res, next) => {
+  console.log('logging')
+  next() // allows to continue executing the next script in the stack
+}
+
+const logSecond = (req, res) => {
+  console.log(' second logging ')
+}
+
+const logThird = (req, res) => {
+  console.log(' Third logging ')
+}
+
+// example to send message when / is hit
+app.get('/', [log, logSecond, logThird], (req, res) => {
+  res.send({ message: 'hello' })
+})
+
+/**
+server running on port :3000
+logging
+second logging
+<-- stops Here
+*/
+```
+
+### Diff Routes
+```javascript
+':/id' : parameter match
+'/user/*' : anything after /user/ match
+'/user' : exact match
+'^(hello)' : regex match for hello
+```
+
+### Sub Router
+If we want to have sub router attached to our main request, then we can make use of `express.Router()` to define those. These routers cannot be used directly like routes. So this needs to be registered with the main app. Example:
+```javascript
+export const app = express()
+const router = express.Router()
+
+//define sub route me
+router.get('/me', (req, res) => {
+  res.send({ message: 'You called router me' })
+})
+
+// attaching the sub route to main route / about
+app.use('/about', router)
+
+export const start = () => {
+  app.listen(3000, () => {
+    console.log('server running on port :3000')
+  })
+}
+
+/**
+ http://localhost:3000/about/me will print the message You called router me
+ */
+```
