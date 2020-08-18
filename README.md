@@ -47,9 +47,13 @@
 - Order of dequeuing `1. Network Queue`, `2. Timer Queue`, `3. I/O Callback Queue`, `4. Check Queue` and `5. Close Queue`.
 - setTimeout will go to Timer Queue, setImmediate will go to Check Queue. All node callbacks ( auto run functions ) will go to `IO Callback Queue`. process & promises will fall into `Network Queue`.
 
-## Express
-- Standard and most widely used framework for managing sockets, routes, error handling etc.
--
+## Express Framework 
+Standard and most widely used framework for managing sockets, routes, error handling etc.
+- Starting simple app we could start with defining `routes`, `controllers`, `modles` respectively and the request flows from user to database where modles are the one which talks to DB. However adding `service` layer helps to minimize the `fat controller` and pull out the business logic out of the controllers.
+- `service` layers should focus on calling the database, validation, processing/formatting the data etc.
+- `controllers` will focus on  pulling out the data as per HTTP request, minimal validation, directing the request to correct service. Typically controller job is to orchestrate several different things.
+
+## 
 
 ## Core Principals
 
